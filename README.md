@@ -21,15 +21,6 @@ The course explores the functional and concurrent programming paradigms of Erlan
 | Lab 7 | Introduciton to Phoenix [UNFINISHED] | [lab7](./lab7/) |
 | Assigment | Erlang Pollution Server ( Mini Project) | [server_assignment](./server_assignment/) |
 
-
-<br/>
-<p align="center">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/3/3b/Elixir_and_Erlang_logo.png" height="200"/>
-  <br/>
-  <i>Concurrent programming with Erlang & Elixir</i>
-</p>
-<br/>
-
 ---
 
 ## Prerequisites
