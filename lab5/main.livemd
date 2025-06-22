@@ -1,0 +1,625 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Elixir lab 5
+
+```elixir
+3+ 5
+```
+
+## LAB
+
+```elixir
+
+```
+
+```elixir
+defmodule Parse do
+  def parse_line(line) do
+    [datetime, type, value, id, name, latlong] = line |> String.split(";")
+    datetime = parse_date(datetime)
+    ogName = name
+    {country, city, name} = parse_name(name)
+    latlong = parse_coords(latlong)
+
+    %{:datetime =>  datetime, 
+      :location => latlong, 
+      :stationId => id,
+      :stationName => name,
+      :stationIdentifier => "#{id}#{ogName}",
+      :pollutionType => type,
+      :pollutionLevel => value |> String.to_float()
+    }
+
+  end
+
+  defp parse_date(date) do
+    [date, time] = date |> String.split("T") |> Enum.map(&String.replace(&1, "Z", ""))
+    {year, month, day} = date |> String.split("-") |> Enum.map(&String.to_integer/1) |> List.to_tuple()
+  
+    [hours, minutes, seconds] = time |> String.split(":") 
+    [hours, minutes] = [hours, minutes] |> Enum.map(&String.to_integer/1)
+    seconds = seconds |> String.slice(0..1) |> String.to_integer()
+    {{year,month,day},{hours, minutes, seconds}}
+  
+  end
+
+  defp parse_name(name) do
+    {country, city, address} = for str <- name |> String.split(",") do str |> String.trim() end |> List.to_tuple()
+  end
+
+  def parse_coords(coords) do
+    {lat,long} = coords |> String.split(",") |> Enum.map(&String.to_float/1) |> List.to_tuple
+  end
+end 
+
+z = File.read!("C:\\Users\\Paweł\\Desktop\\Erlang\\lab5\\AirlyData-ALL-50k.csv")
+# IO.puts(z)
+x = z |> String.split("\n")
+      |> Enum.map(&Parse.parse_line/1)
+      # |> Enum.filter(& &1.pollutionType == "PM10")
+z = z |> String.split("\n")
+      |> Enum.map(&Parse.parse_line/1)
+      |> Enum.uniq(& &1.stationId)
+
+    
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+warning: Enum.uniq/2 is deprecated. Use Enum.uniq_by/2 instead
+└─ c:/Users/Paweł/Desktop/Erlang/lab5/main.livemd#cell:ftt75gw2w32lnacr:47
+
+warning: variable "city" is unused (if the variable is not meant to be used, prefix it with an underscore)
+└─ c:/Users/Paweł/Desktop/Erlang/lab5/main.livemd#cell:ftt75gw2w32lnacr:6: Parse.parse_line/1
+
+warning: variable "country" is unused (if the variable is not meant to be used, prefix it with an underscore)
+└─ c:/Users/Paweł/Desktop/Erlang/lab5/main.livemd#cell:ftt75gw2w32lnacr:6: Parse.parse_line/1
+
+warning: variable "address" is unused (if the variable is not meant to be used, prefix it with an underscore)
+└─ c:/Users/Paweł/Desktop/Erlang/lab5/main.livemd#cell:ftt75gw2w32lnacr:32: Parse.parse_name/1
+
+warning: variable "city" is unused (if the variable is not meant to be used, prefix it with an underscore)
+└─ c:/Users/Paweł/Desktop/Erlang/lab5/main.livemd#cell:ftt75gw2w32lnacr:32: Parse.parse_name/1
+
+warning: variable "country" is unused (if the variable is not meant to be used, prefix it with an underscore)
+└─ c:/Users/Paweł/Desktop/Erlang/lab5/main.livemd#cell:ftt75gw2w32lnacr:32: Parse.parse_name/1
+
+warning: variable "lat" is unused (if the variable is not meant to be used, prefix it with an underscore)
+└─ c:/Users/Paweł/Desktop/Erlang/lab5/main.livemd#cell:ftt75gw2w32lnacr:36: Parse.parse_coords/1
+
+warning: variable "long" is unused (if the variable is not meant to be used, prefix it with an underscore)
+└─ c:/Users/Paweł/Desktop/Erlang/lab5/main.livemd#cell:ftt75gw2w32lnacr:36: Parse.parse_coords/1
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[
+  %{
+    location: {50.057224, 19.933157},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "57570",
+    stationName: "Floriana Straszewskiego",
+    stationIdentifier: "57570Polska, Kraków, Floriana Straszewskiego",
+    pollutionType: "PM1",
+    pollutionLevel: 17.07
+  },
+  %{
+    location: {50.062418, 19.928368},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "9910",
+    stationName: "Studencka",
+    stationIdentifier: "9910Polska, Kraków, Studencka",
+    pollutionType: "PM1",
+    pollutionLevel: 17.24
+  },
+  %{
+    location: {50.057678, 19.926189},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "17",
+    stationName: "Aleja Zygmunta Krasińskiego",
+    stationIdentifier: "17Polska, Kraków, Aleja Zygmunta Krasińskiego",
+    pollutionType: "PM25",
+    pollutionLevel: 28.04
+  },
+  %{
+    location: {50.054907, 19.956501},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "8076",
+    stationName: "Masarska",
+    stationIdentifier: "8076Polska, Kraków, Masarska",
+    pollutionType: "PM1",
+    pollutionLevel: 13.86
+  },
+  %{
+    location: {50.049168, 19.946672},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "55806",
+    stationName: "Świętego Wawrzyńca",
+    stationIdentifier: "55806Polska, Kraków, Świętego Wawrzyńca",
+    pollutionType: "PM1",
+    pollutionLevel: 17.14
+  },
+  %{
+    location: {50.066747, 19.962083},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "9919",
+    stationName: "Kielecka",
+    stationIdentifier: "9919Polska, Kraków, Kielecka",
+    pollutionType: "PM1",
+    pollutionLevel: 16.22
+  },
+  %{
+    location: {50.07174, 19.962317},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "11239",
+    stationName: "Generała Józefa Bema",
+    stationIdentifier: "11239Polska, Kraków, Generała Józefa Bema",
+    pollutionType: "PM1",
+    pollutionLevel: 15.6
+  },
+  %{
+    location: {50.043834, 19.949114},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "59619",
+    stationName: "Rynek Podgórski",
+    stationIdentifier: "59619Polska, Kraków, Rynek Podgórski",
+    pollutionType: "PM1",
+    pollutionLevel: 15.34
+  },
+  %{
+    location: {50.042557, 19.940229},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "39364",
+    stationName: "Przedwiośnie",
+    stationIdentifier: "39364Polska, Kraków, Przedwiośnie",
+    pollutionType: "PM1",
+    pollutionLevel: 17.97
+  },
+  %{
+    location: {50.047736, 19.919646},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "9895",
+    stationName: "Adolfa Nowaczyńskiego",
+    stationIdentifier: "9895Polska, Kraków, Adolfa Nowaczyńskiego",
+    pollutionType: "PM1",
+    pollutionLevel: 18.52
+  },
+  %{
+    location: {50.072968, 19.914829},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "2935",
+    stationName: "Królewska",
+    stationIdentifier: "2935Polska, Kraków, Królewska",
+    pollutionType: "PM1",
+    pollutionLevel: 14.04
+  },
+  %{
+    location: {50.072763, 19.911081},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "8165",
+    stationName: "Leopolda Staffa",
+    stationIdentifier: "8165Polska, Kraków, Leopolda Staffa",
+    pollutionType: "PM1",
+    pollutionLevel: 15.52
+  },
+  %{
+    location: {50.043741, 19.966589},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "9576",
+    stationName: "Powstańców Wielkopolskich",
+    stationIdentifier: "9576Polska, Kraków, Powstańców Wielkopolskich",
+    pollutionType: "PM1",
+    pollutionLevel: 18.84
+  },
+  %{
+    location: {50.039816, 19.965351},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "44928",
+    stationName: "Wielicka",
+    stationIdentifier: "44928Polska, Kraków, Wielicka",
+    pollutionType: "PM1",
+    pollutionLevel: 18.51
+  },
+  %{
+    location: {50.057537, 19.897547},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "9896",
+    stationName: "Vlastimila Hofmana",
+    stationIdentifier: "9896Polska, Kraków, Vlastimila Hofmana",
+    pollutionType: "PM1",
+    pollutionLevel: 16.4
+  },
+  %{
+    location: {50.084134, 19.968416},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "9897",
+    stationName: "Macieja Miechowity",
+    stationIdentifier: "9897Polska, Kraków, Macieja Miechowity",
+    pollutionType: "PM1",
+    pollutionLevel: 11.07
+  },
+  %{
+    location: {50.093619, 19.924138},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "9888",
+    stationName: "Henryka Pachońskiego",
+    stationIdentifier: "9888Polska, Kraków, Henryka Pachońskiego",
+    pollutionType: "PM1",
+    pollutionLevel: 13.33
+  },
+  %{
+    location: {50.094915, 19.952995},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "44968",
+    stationName: "",
+    stationIdentifier: "44968Polska, Kraków, ",
+    pollutionType: "PM1",
+    pollutionLevel: 14.92
+  },
+  %{
+    location: {50.06666, 19.887966},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "44702",
+    stationName: "Emaus",
+    stationIdentifier: "44702Polska, Kraków, Emaus",
+    pollutionType: "PM1",
+    pollutionLevel: 17.54
+  },
+  %{
+    location: {50.081197, 19.895358},
+    datetime: {{2024, 2, 10}, {11, 0, 0}},
+    stationId: "60",
+    stationName: "Racheli",
+    stationIdentifier: "60Polska, Kraków, Racheli",
+    pollutionType: "PM10",
+    pollutionLevel: 24.66
+  },
+  %{
+    location: {50.026179, 19.939701},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "41252",
+    stationName: "Urocza",
+    stationIdentifier: "41252Polska, Kraków, Urocza",
+    pollutionType: "PM1",
+    pollutionLevel: 34.06
+  },
+  %{
+    location: {50.026411, 19.950116},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "10032",
+    stationName: "Puszkarska",
+    stationIdentifier: "10032Polska, Kraków, Puszkarska",
+    pollutionType: "PM1",
+    pollutionLevel: 19.26
+  },
+  %{
+    location: {50.073094, 19.88675},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "9904",
+    stationName: "Wiedeńska",
+    stationIdentifier: "9904Polska, Kraków, Wiedeńska",
+    pollutionType: "PM1",
+    pollutionLevel: 17.86
+  },
+  %{
+    location: {50.025251, 19.937998},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "9886",
+    stationName: "Ferdynanda Kurasia",
+    stationIdentifier: "9886Polska, Kraków, Ferdynanda Kurasia",
+    pollutionType: "PM1",
+    pollutionLevel: 16.74
+  },
+  %{
+    location: {50.08069, 19.99238},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "8973",
+    stationName: "Profesora Michała Życzkowskiego",
+    stationIdentifier: "8973Polska, Kraków, Profesora Michała Życzkowskiego",
+    pollutionType: "PM1",
+    pollutionLevel: 15.02
+  },
+  %{
+    location: {50.099239, 19.953954},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "9899",
+    stationName: "Macieja Słomczyńskiego",
+    stationIdentifier: "9899Polska, Kraków, Macieja Słomczyńskiego",
+    pollutionType: "PM1",
+    pollutionLevel: 14.56
+  },
+  %{
+    location: {50.09422, 19.905241},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "2903",
+    stationName: "Stelmachów",
+    stationIdentifier: "2903Polska, Kraków, Stelmachów",
+    pollutionType: "PM1",
+    pollutionLevel: 14.69
+  },
+  %{
+    location: {50.054622, 20.002049},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "7956",
+    stationName: "Plac Błonie-Beszcz",
+    stationIdentifier: "7956Polska, Kraków, Plac Błonie-Beszcz",
+    pollutionType: "PM1",
+    pollutionLevel: 16.09
+  },
+  %{
+    location: {50.033099, 19.895774},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "7514",
+    stationName: "Na Leszczu",
+    stationIdentifier: "7514Polska, Kraków, Na Leszczu",
+    pollutionType: "PM1",
+    pollutionLevel: 14.63
+  },
+  %{
+    location: {50.044067, 19.998804},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "9903",
+    stationName: "Myśliwska",
+    stationIdentifier: "9903Polska, Kraków, Myśliwska",
+    pollutionType: "PM1",
+    pollutionLevel: 15.43
+  },
+  %{
+    location: {50.102596, 19.917511},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "2098",
+    stationName: "Fiołkowa",
+    stationIdentifier: "2098Polska, Zielonki, Fiołkowa",
+    pollutionType: "PM1",
+    pollutionLevel: 12.94
+  },
+  %{
+    location: {50.077142, 19.876632},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "40131",
+    stationName: "Zygmunta Starego",
+    stationIdentifier: "40131Polska, Kraków, Zygmunta Starego",
+    pollutionType: "PM1",
+    pollutionLevel: 17.5
+  },
+  %{
+    location: {50.084843, 19.878037},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "57494",
+    stationName: "",
+    stationIdentifier: "57494Polska, Kraków, ",
+    pollutionType: "PM1",
+    pollutionLevel: 18.11
+  },
+  %{
+    location: {50.065128, 19.867504},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "11349",
+    stationName: "Aleja Kasztanowa",
+    stationIdentifier: "11349Polska, Kraków, Aleja Kasztanowa",
+    pollutionType: "PM1",
+    pollutionLevel: 15.49
+  },
+  %{
+    location: {50.097127, 19.992093},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "3282",
+    stationName: "Budziszyńska",
+    stationIdentifier: "3282Polska, Kraków, Budziszyńska",
+    pollutionType: "PM1",
+    pollutionLevel: 15.07
+  },
+  %{
+    location: {50.085346, 20.007551},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "9916",
+    stationName: "",
+    stationIdentifier: "9916Polska, Kraków, ",
+    pollutionType: "PM1",
+    pollutionLevel: 12.32
+  },
+  %{
+    location: {50.016578, 19.909836},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "45090",
+    stationName: "",
+    stationIdentifier: "45090Polska, Kraków, ",
+    pollutionType: "PM1",
+    pollutionLevel: 17.43
+  },
+  %{
+    location: {50.010575, 19.949189},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "18",
+    stationName: "Franciszka Bujaka",
+    stationIdentifier: "18Polska, Kraków, Franciszka Bujaka",
+    pollutionType: "PM10",
+    pollutionLevel: 35.61
+  },
+  %{
+    location: {50.018006, 19.983935},
+    datetime: {{2024, 2, 10}, {15, 0, 0}},
+    stationId: "9887",
+    stationName: "Na Kozłówce",
+    stationIdentifier: "9887Polska, Kraków, Na Kozłówce",
+    pollutionType: "PM1",
+    pollutionLevel: 5.49
+  },
+  %{
+    location: {50.022022, 19.994606},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "57423",
+    stationName: "Snycerska",
+    stationIdentifier: "57423Polska, Kraków, Snycerska",
+    pollutionType: "PM1",
+    pollutionLevel: 17.97
+  },
+  %{
+    location: {50.047161, 19.861521},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "11248",
+    stationName: "Gajówka",
+    stationIdentifier: "11248Polska, Kraków, Gajówka",
+    pollutionType: "PM1",
+    pollutionLevel: 8.69
+  },
+  %{
+    location: {50.098304, 19.879415},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "9917",
+    stationName: "Stawowa",
+    stationIdentifier: "9917Polska, Kraków, Stawowa",
+    pollutionType: "PM1",
+    pollutionLevel: 16.8
+  },
+  %{
+    location: {50.108024, 19.896124},
+    datetime: {{2024, 2, 10}, {9, 0, 0}},
+    stationId: "9889",
+    stationName: "Azaliowa",
+    stationIdentifier: "9889Polska, Kraków, Azaliowa",
+    pollutionType: "PM1",
+    pollutionLevel: 12.7
+  },
+  %{
+    location: {50.11677, 19.965575},
+    datetime: {{2024, 2, 10}, {9, 0, ...}},
+    stationId: "7456",
+    stationName: "Forteczna",
+    stationIdentifier: "7456Polska, Węgrzce, Forteczna",
+    pollutionType: "PM1",
+    ...
+  },
+  %{
+    location: {50.117763, 19.92077},
+    datetime: {{2024, 2, ...}, {9, ...}},
+    stationId: "2513",
+    stationName: "Krakowskie Przedmieście",
+    stationIdentifier: "2513Polska, Zielonki, Krakowskie Przedmieście",
+    ...
+  },
+  %{
+    location: {50.118583, 19.926746},
+    datetime: {{2024, ...}, {...}},
+    stationId: "251",
+    stationName: "Galicyjska",
+    ...
+  },
+  %{location: {50.1167, 19.91429}, datetime: {{...}, ...}, stationId: "5651", ...},
+  %{location: {50.115496, ...}, datetime: {...}, ...},
+  %{location: {...}, ...},
+  %{...},
+  ...
+]
+```
+
+```elixir
+Application.stop(:lab)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:error, {:not_started, :lab}}
+```
+
+```elixir
+Code.append_path("C:\\Users\\Paweł\\Desktop\\Erlang\\lab4\\rebar\\lab\\_build\\default\\lib\\lab\\ebin")
+Application.start(:lab)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+```elixir
+length(z)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+86
+```
+
+```elixir
+fun = fn -> z |> Enum.map(& :pollution_gen_server.add_station(&1.stationIdentifier, &1.location)) end
+result_add = fun |> :timer.tc |> elem(0)
+result_add / 1_000_000
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+0.035737
+```
+
+```elixir
+length(x)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+58506
+```
+
+```elixir
+fun = fn -> x |> Enum.map(& :pollution_gen_server.add_value(&1.stationIdentifier, &1.datetime, &1.pollutionType, &1.pollutionLevel)) end
+result_vals = fun |> :timer.tc |> elem(0)
+result_vals / 1_000_000
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+5.25742
+```
+
+```elixir
+fun_query = fn -> :pollution_gen_server.get_station_min("9910Polska, Kraków, Studencka", "PM10") end 
+val_query_1 = fun_query |> :timer.tc |> elem(0) 
+val_query_1 / 1_000_000
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+1.02e-4
+```
+
+```elixir
+fun_query.()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+1.14
+```
+
+```elixir
+fun_query_2 = fn -> :pollution_gen_server.get_daily_mean("PM25", {2024, 2, 10}) end
+val_query_2 = fun_query_2 |> :timer.tc |> elem(0) 
+val_query_2 / 1_000_000
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+0.004403
+```
+
+```elixir
+fun_query_2.()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+20.524901639344264
+```
